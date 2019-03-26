@@ -119,7 +119,7 @@ func ExpandApiManagementOperationRepresentation(input []interface{}) (*[]apimana
 		vs := v.(map[string]interface{})
 
 		contentType := vs["content_type"].(string)
-		formParametersRaw := vs["form_parameter"].(*schema.Set).List()
+		formParametersRaw := vs["form_parameter"].([]interface{})
 		formParameters := ExpandApiManagementOperationParameterContract(formParametersRaw)
 		sample := vs["sample"].(string)
 		schemaId := vs["schema_id"].(string)
@@ -192,7 +192,7 @@ func FlattenApiManagementOperationRepresentation(input *[]apimanagement.Represen
 
 func SchemaApiManagementOperationParameterContract() *schema.Schema {
 	return &schema.Schema{
-		Type:     schema.TypeSet,
+		Type:     schema.TypeList,
 		Optional: true,
 		Elem: &schema.Resource{
 			Schema: map[string]*schema.Schema{
@@ -261,12 +261,12 @@ func ExpandApiManagementOperationParameterContract(input []interface{}) *[]apima
 	return &outputs
 }
 
-func FlattenApiManagementOperationParameterContract(input *[]apimanagement.ParameterContract) *schema.Set {
-	outputs := make([]interface{}, 0)
+func FlattenApiManagementOperationParameterContract(input *[]apimanagement.ParameterContract) []interface{} {
 	if input == nil {
-		return schema.NewSet(schema.HashSchema(SchemaApiManagementOperationParameterContract()), outputs)
+		return []interface{}{}
 	}
 
+	outputs := make([]interface{}, 0)
 	for _, v := range *input {
 		output := map[string]interface{}{}
 
@@ -295,5 +295,5 @@ func FlattenApiManagementOperationParameterContract(input *[]apimanagement.Param
 		outputs = append(outputs, output)
 	}
 
-	return schema.NewSet(schema.HashSchema(SchemaApiManagementOperationParameterContract()), outputs)
+	return outputs
 }

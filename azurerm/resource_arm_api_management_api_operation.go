@@ -10,8 +10,6 @@ import (
 	"github.com/terraform-providers/terraform-provider-azurerm/azurerm/utils"
 )
 
-// TODO: a Data Source, but without Request/Response things?
-
 func resourceArmApiManagementApiOperation() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceArmApiManagementApiOperationCreateUpdate,
@@ -73,7 +71,7 @@ func resourceArmApiManagementApiOperation() *schema.Resource {
 			},
 
 			"response": {
-				Type:     schema.TypeSet,
+				Type:     schema.TypeList,
 				Optional: true,
 				Elem: &schema.Resource{
 					Schema: map[string]*schema.Schema{
@@ -119,13 +117,13 @@ func resourceArmApiManagementApiOperationCreateUpdate(d *schema.ResourceData, me
 		return err
 	}
 
-	responseContractsRaw := d.Get("response").(*schema.Set).List()
+	responseContractsRaw := d.Get("response").([]interface{})
 	responseContracts, err := expandApiManagementOperationResponseContract(responseContractsRaw)
 	if err != nil {
 		return err
 	}
 
-	templateParametersRaw := d.Get("template_parameter").(*schema.Set).List()
+	templateParametersRaw := d.Get("template_parameter").([]interface{})
 	templateParameters := azure.ExpandApiManagementOperationParameterContract(templateParametersRaw)
 
 	parameters := apimanagement.OperationContract{
@@ -241,10 +239,10 @@ func expandApiManagementOperationRequestContract(input []interface{}) (*apimanag
 	vs := input[0].(map[string]interface{})
 	description := vs["description"].(string)
 
-	headersRaw := vs["header"].(*schema.Set).List()
+	headersRaw := vs["header"].([]interface{})
 	headers := azure.ExpandApiManagementOperationParameterContract(headersRaw)
 
-	queryParametersRaw := vs["query_parameter"].(*schema.Set).List()
+	queryParametersRaw := vs["query_parameter"].([]interface{})
 	queryParameters := azure.ExpandApiManagementOperationParameterContract(queryParametersRaw)
 
 	representationsRaw := vs["representation"].([]interface{})
@@ -292,7 +290,7 @@ func expandApiManagementOperationResponseContract(input []interface{}) (*[]apima
 		description := vs["description"].(string)
 		statusCode := vs["status_code"].(int)
 
-		headersRaw := vs["header"].(*schema.Set).List()
+		headersRaw := vs["header"].([]interface{})
 		headers := azure.ExpandApiManagementOperationParameterContract(headersRaw)
 
 		representationsRaw := vs["representation"].([]interface{})
